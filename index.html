@@ -3,115 +3,428 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой сайт с рекламой</title>
+    <title>Крестики-нолики</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
         body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
+            color: white;
         }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
         header {
-            background: #2c3e50;
-            color: white;
-            padding: 2rem;
             text-align: center;
-            border-radius: 10px;
-            margin-bottom: 2rem;
+            margin-bottom: 20px;
         }
-        .content {
-            background: #f8f9fa;
-            padding: 2rem;
-            border-radius: 10px;
-            margin-bottom: 2rem;
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
-        /* Стили для рекламных блоков */
-        .ad-block {
-            background: #e9ecef;
-            border: 2px dashed #6c757d;
-            padding: 2rem;
-            text-align: center;
-            margin: 2rem 0;
-            border-radius: 10px;
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 100%;
         }
-        .ad-label {
-            background: #6c757d;
+        
+        .game-board {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-mode {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
-            display: inline-block;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
         }
+        
+        .mode-btn.active {
+            background: #4da6ff;
+            border-color: #4da6ff;
+        }
+        
+        .status {
+            margin: 20px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            min-height: 40px;
+        }
+        
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .cell {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .cell:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-3px);
+        }
+        
+        .cell.x {
+            color: #ff4d4d;
+        }
+        
+        .cell.o {
+            color: #4da6ff;
+        }
+        
+        .reset-btn {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: #4da6ff;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .reset-btn:hover {
+            background: #3385d6;
+            transform: translateY(-3px);
+        }
+        
+        .ad-container {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .ad-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .ad-content {
+            width: 100%;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .ad-text {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .ad-placeholder {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
         footer {
+            margin-top: 30px;
             text-align: center;
-            padding: 2rem;
-            color: #6c757d;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 700px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .game-board, .ad-container {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🚀 Мой сайт</h1>
-        <p>Зарабатываем на рекламе вместе!</p>
-    </header>
-
-    <div class="content">
-        <h2>Добро пожаловать на мой сайт!</h2>
-        <p>Это пример того, как можно легко добавить рекламу на любой сайт.</p>
+    <div class="container">
+        <header>
+            <h1>Крестики-нолики</h1>
+            <p>Классическая игра для двух игроков или против бота</p>
+        </header>
         
-        <!-- РЕКЛАМНЫЙ БЛОК 1 - Вверху контента -->
-        <div class="ad-block">
-            <div class="ad-label">РЕКЛАМА</div>
-            <p>📢 Здесь будет рекламный блок #1</p>
-            <!-- ВСТАВЬТЕ КОД РЕКЛАМЫ ЗДЕСЬ -->
-            <div style="background: #fff; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                <strong>Вставьте сюда код из Typer/Adsterra</strong>
+        <div class="game-container">
+            <div class="game-board">
+                <div class="game-mode">
+                    <button class="mode-btn active" id="modeTwoPlayers">Два игрока</button>
+                    <button class="mode-btn" id="modeVsBot">Против бота</button>
+                </div>
+                <div class="status" id="status">Ход игрока: X</div>
+                <div class="board" id="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+                <button class="reset-btn" id="reset">Новая игра</button>
+            </div>
+            
+            <div class="ad-container">
+                <h2 class="ad-title">Рекламный блок</h2>
+                <div class="ad-content">
+                    <div class="ad-placeholder">Реклама</div>
+                    <p class="ad-text">Здесь может быть размещена ваша реклама</p>
+                </div>
             </div>
         </div>
-
-        <h3>Полезная информация</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
         
-        <!-- РЕКЛАМНЫЙ БЛОК 2 - В середине контента -->
-        <div class="ad-block">
-            <div class="ad-label">РЕКЛАМА</div>
-            <p>🎯 Здесь будет рекламный блок #2</p>
-            <!-- ВСТАВЬТЕ КОД РЕКЛАМЫ ЗДЕСЬ -->
-            <div style="background: #fff; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                <strong>Вставьте сюда код из Typer/Adsterra</strong>
-            </div>
-        </div>
-
-        <h3>Еще больше контента</h3>
-        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <footer>
+            <p>© 2025 Крестики-нолики. Все права защищены.</p>
+        </footer>
     </div>
 
-    <!-- РЕКЛАМНЫЙ БЛОК 3 - В подвале -->
-    <div class="ad-block">
-        <div class="ad-label">РЕКЛАМА</div>
-        <p>💫 Здесь будет рекламный блок #3</p>
-        <!-- ВСТАВЬТЕ КОД РЕКЛАМЫ ЗДЕСЬ -->
-        <div style="background: #fff; padding: 15px; border-radius: 5px; margin: 10px 0;">
-            <strong>Вставьте сюда код из Typer/Adsterra</strong>
-        </div>
-    </div>
-
-    <footer>
-        <p>© 2024 Мой сайт с рекламой</p>
-    </footer>
-
-    <!-- СКРИПТ ДЛЯ РЕКЛАМЫ - можно вставить перед закрывающим тегом body -->
     <script>
-        // Здесь можно разместить дополнительные рекламные скрипты
-        console.log('Сайт загружен. Места для рекламы готовы!');
+        document.addEventListener('DOMContentLoaded', () => {
+            const statusDisplay = document.getElementById('status');
+            const cells = document.querySelectorAll('.cell');
+            const resetButton = document.getElementById('reset');
+            const modeTwoPlayersBtn = document.getElementById('modeTwoPlayers');
+            const modeVsBotBtn = document.getElementById('modeVsBot');
+            
+            let gameActive = true;
+            let currentPlayer = "X";
+            let gameState = ["", "", "", "", "", "", "", "", ""];
+            let vsBotMode = false;
+            
+            const winningConditions = [
+                [0, 1, 2],
+                [3, 4, 5],
+                [6, 7, 8],
+                [0, 3, 6],
+                [1, 4, 7],
+                [2, 5, 8],
+                [0, 4, 8],
+                [2, 4, 6]
+            ];
+            
+            const winningMessage = () => `Победил игрок ${currentPlayer}!`;
+            const drawMessage = () => `Ничья!`;
+            const currentPlayerTurn = () => `Ход игрока: ${currentPlayer}`;
+            
+            statusDisplay.innerHTML = currentPlayerTurn();
+            
+            function handleCellClick(clickedCellEvent) {
+                const clickedCell = clickedCellEvent.target;
+                const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+                
+                if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                    return;
+                }
+                
+                handleCellPlayed(clickedCell, clickedCellIndex);
+                handleResultValidation();
+                
+                // Если режим против бота и игра продолжается, ходит бот
+                if (vsBotMode && gameActive && currentPlayer === "O") {
+                    setTimeout(botMove, 500);
+                }
+            }
+            
+            function handleCellPlayed(clickedCell, clickedCellIndex) {
+                gameState[clickedCellIndex] = currentPlayer;
+                clickedCell.innerHTML = currentPlayer;
+                clickedCell.classList.add(currentPlayer.toLowerCase());
+            }
+            
+            function handleResultValidation() {
+                let roundWon = false;
+                for (let i = 0; i < winningConditions.length; i++) {
+                    const winCondition = winningConditions[i];
+                    let a = gameState[winCondition[0]];
+                    let b = gameState[winCondition[1]];
+                    let c = gameState[winCondition[2]];
+                    
+                    if (a === '' || b === '' || c === '') {
+                        continue;
+                    }
+                    
+                    if (a === b && b === c) {
+                        roundWon = true;
+                        break;
+                    }
+                }
+                
+                if (roundWon) {
+                    statusDisplay.innerHTML = winningMessage();
+                    gameActive = false;
+                    return;
+                }
+                
+                let roundDraw = !gameState.includes("");
+                if (roundDraw) {
+                    statusDisplay.innerHTML = drawMessage();
+                    gameActive = false;
+                    return;
+                }
+                
+                handlePlayerChange();
+            }
+            
+            function handlePlayerChange() {
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+                statusDisplay.innerHTML = currentPlayerTurn();
+            }
+            
+            function handleRestartGame() {
+                gameActive = true;
+                currentPlayer = "X";
+                gameState = ["", "", "", "", "", "", "", "", ""];
+                statusDisplay.innerHTML = currentPlayerTurn();
+                cells.forEach(cell => {
+                    cell.innerHTML = "";
+                    cell.classList.remove("x", "o");
+                });
+                
+                // Если режим против бота и бот ходит первым
+                if (vsBotMode && currentPlayer === "O") {
+                    setTimeout(botMove, 500);
+                }
+            }
+            
+            function botMove() {
+                if (!gameActive || currentPlayer !== "O") return;
+                
+                // Простая логика бота: сначала проверяем возможность выигрыша, затем блокируем игрока
+                let availableCells = [];
+                gameState.forEach((cell, index) => {
+                    if (cell === "") availableCells.push(index);
+                });
+                
+                // Проверяем, может ли бот выиграть
+                for (let i = 0; i < availableCells.length; i++) {
+                    let testGameState = [...gameState];
+                    testGameState[availableCells[i]] = "O";
+                    if (checkWinner(testGameState) === "O") {
+                        makeBotMove(availableCells[i]);
+                        return;
+                    }
+                }
+                
+                // Проверяем, нужно ли блокировать игрока
+                for (let i = 0; i < availableCells.length; i++) {
+                    let testGameState = [...gameState];
+                    testGameState[availableCells[i]] = "X";
+                    if (checkWinner(testGameState) === "X") {
+                        makeBotMove(availableCells[i]);
+                        return;
+                    }
+                }
+                
+                // Иначе случайный ход
+                const randomIndex = Math.floor(Math.random() * availableCells.length);
+                makeBotMove(availableCells[randomIndex]);
+            }
+            
+            function makeBotMove(index) {
+                const cell = document.querySelector(`.cell[data-index="${index}"]`);
+                handleCellPlayed(cell, index);
+                handleResultValidation();
+            }
+            
+            function checkWinner(state) {
+                for (let i = 0; i < winningConditions.length; i++) {
+                    const [a, b, c] = winningConditions[i];
+                    if (state[a] && state[a] === state[b] && state[a] === state[c]) {
+                        return state[a];
+                    }
+                }
+                return null;
+            }
+            
+            function setGameMode(mode) {
+                vsBotMode = mode === 'bot';
+                
+                // Обновляем активные кнопки
+                modeTwoPlayersBtn.classList.toggle('active', !vsBotMode);
+                modeVsBotBtn.classList.toggle('active', vsBotMode);
+                
+                // Перезапускаем игру
+                handleRestartGame();
+            }
+            
+            cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+            resetButton.addEventListener('click', handleRestartGame);
+            modeTwoPlayersBtn.addEventListener('click', () => setGameMode('twoPlayers'));
+            modeVsBotBtn.addEventListener('click', () => setGameMode('bot'));
+        });
     </script>
 </body>
 </html>
