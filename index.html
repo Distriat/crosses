@@ -3,1141 +3,796 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Морской Бой - P2P WebRTC</title>
+    <title>Архитектура систем питания мобильных устройств | От основ к advanced</title>
     <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #1a252f;
+            --code-bg: #1e1e1e;
+            --gradient-start: #667eea;
+            --gradient-end: #764ba2;
+        }
+        
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            line-height: 1.7;
+            color: var(--dark);
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             min-height: 100vh;
-            padding: 20px;
-            color: #333;
+            font-size: 16px;
         }
-
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 15px;
+        }
+        
+        .article-card {
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+            margin: 30px 0;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+            position: relative;
             overflow: hidden;
         }
-
-        header {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            color: white;
-            padding: 20px;
-            text-align: center;
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="circuit" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23circuit)"/></svg>');
+            opacity: 0.3;
         }
-
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            position: relative;
         }
-
-        .subtitle {
-            font-size: 1.1em;
+        
+        .header .subtitle {
+            font-size: 1.3em;
             opacity: 0.9;
+            font-weight: 300;
+            position: relative;
         }
-
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
         .section {
-            padding: 30px;
-            display: none;
+            margin-bottom: 60px;
+            scroll-margin-top: 20px;
         }
-
-        .section.active {
-            display: block;
+        
+        .section h2 {
+            color: var(--primary);
+            border-bottom: 4px solid var(--secondary);
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 600;
         }
-
-        h2 {
-            color: #2c3e50;
+        
+        .section h3 {
+            color: var(--secondary);
+            margin: 30px 0 18px 0;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        p {
             margin-bottom: 20px;
-            text-align: center;
+            text-align: justify;
+            font-size: 1.05em;
         }
-
-        h3 {
-            color: #34495e;
-            margin-bottom: 15px;
+        
+        .complexity-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
         }
-
-        /* Connection Section */
-        .connection-options {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
+        
+        .beginner { background: var(--success); color: white; }
+        .intermediate { background: var(--warning); color: white; }
+        .advanced { background: var(--accent); color: white; }
+        
+        .circuit-diagram {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 15px;
             margin: 30px 0;
+            border-left: 6px solid var(--secondary);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         }
-
-        .option {
+        
+        .power-flow {
             background: #f8f9fa;
-            padding: 25px;
+            padding: 35px;
+            border-radius: 15px;
+            margin: 35px 0;
+            font-family: 'Courier New', monospace;
+            line-height: 1.9;
+            border: 2px dashed var(--secondary);
+        }
+        
+        .flow-step {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
             border-radius: 10px;
-            border: 2px solid #e9ecef;
-            text-align: center;
-            flex: 1;
-            min-width: 300px;
-            transition: transform 0.3s, border-color 0.3s;
+            border-left: 5px solid var(--secondary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
         }
-
-        .option:hover {
-            transform: translateY(-5px);
-            border-color: #3498db;
+        
+        .flow-step:hover {
+            transform: translateX(5px);
         }
-
-        .option h4 {
-            margin-bottom: 15px;
-            color: #2c3e50;
+        
+        .voltage-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 0 5px;
+            font-weight: 600;
         }
-
-        input, textarea {
+        
+        .current-badge {
+            display: inline-block;
+            background: var(--warning);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            margin: 0 5px;
+            font-weight: 600;
+        }
+        
+        .component-table {
             width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-            font-family: monospace;
-        }
-
-        /* Boards */
-        .boards-container {
-            display: flex;
-            gap: 40px;
-            justify-content: center;
-            flex-wrap: wrap;
+            border-collapse: collapse;
             margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
         }
-
-        .board-container {
+        
+        .component-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, #34495e 100%);
+            color: white;
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .component-table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .component-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .component-table tr:hover {
+            background: #e3f2fd;
+            transition: background 0.3s ease;
+        }
+        
+        .code-block {
+            background: var(--code-bg);
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 25px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            overflow-x: auto;
+            border-left: 5px solid var(--secondary);
+        }
+        
+        .comment { color: #75715e; }
+        .keyword { color: #f92672; }
+        .function { color: #a6e22e; }
+        .string { color: #e6db74; }
+        .number { color: #ae81ff; }
+        .type { color: #66d9ef; }
+        
+        .interactive-demo {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 35px;
+            border-radius: 15px;
+            margin: 35px 0;
             text-align: center;
+            border: 2px solid var(--secondary);
         }
-
-        .board-container h4 {
+        
+        .voltage-slider {
+            width: 100%;
+            margin: 20px 0;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .voltage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--secondary);
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .demo-result {
+            margin-top: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .schematic {
+            background: white;
+            padding: 30px;
+            border: 2px solid var(--secondary);
+            border-radius: 12px;
+            margin: 30px 0;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.6;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .schematic-line {
+            margin: 12px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .schematic-line::before {
+            content: '▸';
+            position: absolute;
+            left: 10px;
+            color: var(--secondary);
+        }
+        
+        .tech-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        
+        .spec-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .spec-card h4 {
+            color: var(--primary);
             margin-bottom: 15px;
             font-size: 1.2em;
         }
-
-        .board {
-            display: grid;
-            grid-template-columns: repeat(10, 40px);
-            grid-template-rows: repeat(10, 40px);
-            gap: 2px;
-            background: #b3d9ff;
-            padding: 10px;
-            border-radius: 8px;
-            border: 3px solid #3498db;
-        }
-
-        .cell {
-            width: 40px;
-            height: 40px;
-            background: rgba(173, 216, 230, 0.7);
-            border: 1px solid #3498db;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            transition: all 0.2s;
-            border-radius: 3px;
-        }
-
-        .cell:hover {
-            background: rgba(135, 206, 250, 0.9);
-            transform: scale(1.05);
-        }
-
-        .cell.ship {
-            background: #2c3e50;
-            border-color: #34495e;
-        }
-
-        .cell.hit {
-            background: #e74c3c;
-            border-color: #c0392b;
-        }
-
-        .cell.hit.ship::after {
-            content: "💥";
-            font-size: 16px;
-        }
-
-        .cell.miss {
-            background: #ecf0f1;
-            border-color: #bdc3c7;
-        }
-
-        .cell.miss::after {
-            content: "•";
-            color: #7f8c8d;
-            font-size: 20px;
-        }
-
-        .cell:not(.hit):not(.miss):not(.ship):hover {
-            background: #3498db;
-        }
-
-        /* Game Info */
-        .game-info {
-            background: #ecf0f1;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .connection-status {
-            font-size: 1.1em;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-        }
-
-        .status-connecting {
-            background: #f39c12;
-            color: white;
-        }
-
-        .status-connected {
-            background: #27ae60;
-            color: white;
-        }
-
-        .status-disconnected {
-            background: #e74c3c;
-            color: white;
-        }
-
-        /* Controls */
-        .p2p-controls {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .code-section {
-            margin: 15px 0;
-        }
-
-        .code-section h4 {
-            margin-bottom: 10px;
-            color: #2c3e50;
-        }
-
-        /* Buttons */
-        button {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s;
-            margin: 5px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            background: linear-gradient(135deg, #2980b9, #3498db);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            background: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        button.secondary {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        }
-
-        button.success {
-            background: linear-gradient(135deg, #27ae60, #229954);
-        }
-
-        button.danger {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-
-        /* Loading */
-        .loading {
-            text-align: center;
+        
+        .deep-dive {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffecb3 100%);
             padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 6px solid var(--warning);
         }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        
+        .deep-dive h3 {
+            color: var(--warning);
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        /* Instructions */
-        .instructions {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
+        
+        .comparison-table th, .comparison-table td {
             padding: 15px;
-            margin: 20px 0;
-            color: #856404;
+            text-align: center;
+            border: 1px solid #ddd;
         }
-
-        .instructions h4 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-
-        .instructions ol {
-            margin-left: 20px;
-        }
-
-        .instructions li {
-            margin: 8px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .boards-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .board {
-                grid-template-columns: repeat(10, 35px);
-                grid-template-rows: repeat(10, 35px);
-            }
-            
-            .cell {
-                width: 35px;
-                height: 35px;
-            }
-            
-            .connection-options {
-                flex-direction: column;
-            }
-            
-            .option {
-                min-width: auto;
-            }
-        }
-
-        /* Ship counters */
-        .ship-counters {
-            display: flex;
-            justify-content: space-around;
-            margin: 15px 0;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .ship-counter {
-            background: #34495e;
+        
+        .comparison-table th {
+            background: var(--primary);
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
         }
-
-        .ship-counter.destroyed {
-            background: #e74c3c;
-            text-decoration: line-through;
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 25px 20px;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .header .subtitle {
+                font-size: 1.1em;
+            }
+            
+            .section h2 {
+                font-size: 1.7em;
+            }
+            
+            .section h3 {
+                font-size: 1.3em;
+            }
+            
+            p {
+                font-size: 1em;
+                text-align: left;
+            }
+            
+            .power-flow, .circuit-diagram, .interactive-demo {
+                padding: 20px;
+            }
+            
+            .flow-step {
+                padding: 12px;
+            }
+            
+            .tech-specs {
+                grid-template-columns: 1fr;
+            }
+            
+            .component-table, .comparison-table {
+                font-size: 0.9em;
+            }
+            
+            .component-table th, .component-table td {
+                padding: 12px 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.7em;
+            }
+            
+            .section h2 {
+                font-size: 1.5em;
+            }
+            
+            .section h3 {
+                font-size: 1.2em;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .code-block {
+                padding: 15px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🚢 Морской Бой</h1>
-            <div class="subtitle">P2P версия через WebRTC - играйте напрямую с друзьями!</div>
-        </header>
-
-        <!-- Connection Section -->
-        <div id="connection-section" class="section active">
-            <h2>Подключение к игре</h2>
+        <article class="article-card">
+            <header class="header">
+                <h1>Архитектура систем питания мобильных устройств</h1>
+                <div class="subtitle">От основ до advanced: полное руководство по схемотехнике питания современных смартфонов</div>
+            </header>
             
-            <div class="instructions">
-                <h4>📋 Как играть:</h4>
-                <ol>
-                    <li><strong>Создатель игры</strong> нажимает "Создать игру", копирует Offer код и отправляет другу</li>
-                    <li><strong>Участник</strong> вставляет Offer код и нажимает "Присоединиться"</li>
-                    <li><strong>Оба игрока</strong> расставляют корабли и начинают игру</li>
-                    <li>Играйте в реальном времени через P2P соединение!</li>
-                </ol>
-            </div>
+            <div class="content">
+                <!-- Базовый уровень -->
+                <section class="section" id="basics">
+                    <h2>🔋 Основы питания мобильных устройств <span class="complexity-badge beginner">Базовый уровень</span></h2>
+                    
+                    <p>Прежде чем погружаться в сложные схемы, разберем фундаментальные принципы. Каждый смартфон — это миниатюрная электростанция, которая должна эффективно распределять энергию между десятками компонентов.</p>
+                    
+                    <div class="circuit-diagram">
+                        <h3>📊 Ключевые показатели системы питания</h3>
+                        <div class="tech-specs">
+                            <div class="spec-card">
+                                <h4>⚡ Энергоэффективность</h4>
+                                <p>Современные PMIC достигают КПД 94-97% в пиковых режимах. Каждый 1% повышения КПД дает +30 минут автономной работы.</p>
+                            </div>
+                            <div class="spec-card">
+                                <h4>🔌 Плотность мощности</h4>
+                                <p>До 5Вт/см³ в современных решениях. Для сравнения: ноутбуки — 1-2Вт/см³, промышленные системы — 0.5-1Вт/см³.</p>
+                            </div>
+                            <div class="spec-card">
+                                <h4>🔄 Динамический диапазон</h4>
+                                <p>Система должна стабильно работать при токах от 1мА (режим ожидания) до 5А (пиковая нагрузка + зарядка).</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>🔧 Базовые компоненты системы питания</h3>
+                    
+                    <table class="component-table">
+                        <thead>
+                            <tr>
+                                <th>Компонент</th>
+                                <th>Назначение</th>
+                                <th>Ключевые параметры</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Аккумулятор</strong></td>
+                                <td>Основной источник энергии</td>
+                                <td>3.7-4.35V, 2000-5000mAh, 5-15C разряд</td>
+                            </tr>
+                            <tr>
+                                <td><strong>PMIC</strong></td>
+                                <td>Мозг системы питания</td>
+                                <td>10-20 каналов, КПД 90-97%, I²C/SPI</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DC-DC преобразователи</strong></td>
+                                <td>Изменение напряжения</td>
+                                <td>Buck/Boost/Buck-Boost, 1-6MHz</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LDO стабилизаторы</strong></td>
+                                <td>Чистое питание для чувствительных схем</td>
+                                <td>PSRR 60-80dB, шум 10-100µV</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BMS</strong></td>
+                                <td>Защита и мониторинг батареи</td>
+                                <td>Protection IC, Fuel Gauge, NTC</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
 
-            <div class="connection-options">
-                <div class="option">
-                    <h4>🎮 Создать новую игру</h4>
-                    <p>Вы будете создателем комнаты</p>
-                    <button onclick="createP2PGame()" id="create-btn">Создать игру</button>
-                </div>
+                <!-- Средний уровень -->
+                <section class="section" id="power-path">
+                    <h2>🔄 Полный путь питания: от розетки до процессора <span class="complexity-badge intermediate">Средний уровень</span></h2>
+                    
+                    <div class="power-flow">
+                        <div class="flow-step">
+                            <strong>🎯 Фаза 1: Внешний источник и согласование</strong><br>
+                            USB-C PD/QC4+ протокол → Определение мощности (15-100Вт) → Handshake с зарядным устройством<br>
+                            <span class="voltage-badge">5-20V</span> <span class="current-badge">1-5A</span>
+                        </div>
+                        
+                        <div class="flow-step">
+                            <strong>🔒 Фаза 2: Защита и коммутация</strong><br>
+                            OVP (Over-Voltage Protection) до 30V → OCP (Over-Current Protection) → ESD защита 8kV<br>
+                            MOSFET коммутация с R<sub>DS(ON)</sub> < 10mΩ
+                        </div>
+                        
+                        <div class="flow-step">
+                            <strong>🔋 Фаза 3: Интеллектуальная зарядка</strong><br>
+                            CC/CV с температурной компенсацией → Двухэтапная предзарядка → Пульсирующий заряд для балансировки<br>
+                            Trickle → Pre-charge → Fast charge → CV phase
+                        </div>
+                        
+                        <div class="flow-step">
+                            <strong>🎛️ Фаза 4: PMIC - распределение энергии</strong><br>
+                            Real-time мониторинг 20+ параметров → Dynamic Voltage Scaling → Power Gating ненужных модулей<br>
+                            Реакция на изменения нагрузки за 1-10µs
+                        </div>
+                        
+                        <div class="flow-step">
+                            <strong>⚡ Фаза 5: Генерация системных напряжений</strong><br>
+                            <div class="schematic">
+                                <div class="schematic-line"><strong>SoC Core:</strong> Multi-phase Buck → <span class="voltage-badge">0.6-1.2V</span> <span class="current-badge">до 8A</span> (AVFS технология)</div>
+                                <div class="schematic-line"><strong>GPU Power:</strong> 3-phase Buck → <span class="voltage-badge">0.55-1.1V</span> <span class="current-badge">до 6A</span> (dVFS 100µs response)</div>
+                                <div class="schematic-line"><strong>LPDDR5/X:</strong> Dual-rail Buck → <span class="voltage-badge">1.05V/0.9V</span> <span class="current-badge">3A</span> (VDDQ/VDDQCA)</div>
+                                <div class="schematic-line"><strong>OLED Display:</strong> Boost + Charge Pump → <span class="voltage-badge">5.5-8.5V</span> <span class="current-badge">120mA</span> (HBM до 15V)</div>
+                                <div class="schematic-line"><strong>Camera Systems:</strong> Buck + LDO → <span class="voltage-badge">2.8V/1.8V/1.2V</span> (AF/OIS/Sensor power)</div>
+                                <div class="schematic-line"><strong>5G RF:</strong> Buck + Low-noise LDO → <span class="voltage-badge">3.3V/1.8V</span> <span class="current-badge">1.2A peak</span> (PA supply)</div>
+                                <div class="schematic-line"><strong>Audio Codec:</strong> Buck-Boost + Ultra-LDO → <span class="voltage-badge">3.3V</span> (PSRR > 90dB @ 1kHz)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="deep-dive">
+                        <h3>🔍 Глубокое погружение: Multi-phase Buck Converters</h3>
+                        <p>Для питания современных процессоров используются многофазные понижающие преобразователи. Вместо одного мощного канала, используются 3-4 параллельных фазы, работающие со сдвигом фаз.</p>
+                        
+                        <p><strong>Преимущества:</strong></p>
+                        <ul>
+                            <li>Уменьшение пульсаций в 3-4 раза при том же количестве емкости</li>
+                            <li>Улучшение теплового режима (награв распределен между несколькими IC)</li>
+                            <li>Быстрый transient response (10-20µs вместо 50-100µs)</li>
+                            <li>Возможность динамического включения/выключения фаз в зависимости от нагрузки</li>
+                        </ul>
+                        
+                        <div class="code-block">
+                            <span class="comment">// Алгоритм управления многофазным Buck преобразователем</span><br>
+                            <span class="keyword">class</span> <span class="type">MultiPhaseBuck</span> {<br>
+                            &nbsp;&nbsp;<span class="keyword">constructor</span>(phases) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.phases = phases;<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.phaseShift = <span class="number">360</span> / phases;<br>
+                            &nbsp;&nbsp;}<br><br>
+                            &nbsp;&nbsp;<span class="function">dynamicPhaseShedding</span>(loadCurrent) {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> activePhases = <span class="function">Math</span>.ceil(loadCurrent / <span class="number">2</span>); <span class="comment">// 2A на фазу</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="function">Math</span>.min(activePhases, <span class="keyword">this</span>.phases);<br>
+                            &nbsp;&nbsp;}<br>
+                            }
+                        </div>
+                    </div>
+                </section>
 
-                <div class="option">
-                    <h4>🔗 Присоединиться к игре</h4>
-                    <p>У вас есть код от друга?</p>
-                    <textarea id="offer-input" placeholder="Вставьте сюда Offer код от создателя игры..."></textarea>
-                    <button onclick="joinP2PGame()" id="join-btn">Присоединиться</button>
-                </div>
-            </div>
-        </div>
+                <!-- Продвинутый уровень -->
+                <section class="section" id="advanced">
+                    <h2>🚀 Advanced схемотехника и будущие тренды <span class="complexity-badge advanced">Продвинутый уровень</span></h2>
+                    
+                    <h3>🧠 AI-оптимизация энергопотребления</h3>
+                    <p>Современные PMIC используют машинное обучение для предсказания паттернов нагрузки и оптимизации работы преобразователей в реальном времени.</p>
+                    
+                    <div class="circuit-diagram">
+                        <h4>🤖 Нейросетевая оптимизация мощности</h4>
+                        <ul>
+                            <li><strong>Predictive DVFS:</strong> Предсказание нагрузки CPU/GPU за 1-2ms до фактического изменения</li>
+                            <li><strong>Pattern Recognition:</strong> Анализ поведения пользователя для оптимизации фоновых процессов</li>
+                            <li><strong>Thermal Modeling:</strong> AI-модель теплового поведения системы и проактивное управление</li>
+                        </ul>
+                    </div>
+                    
+                    <h3>⚡ GaN и SiC технологии</h3>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Параметр</th>
+                                <th>Si MOSFET</th>
+                                <th>GaN HEMT</th>
+                                <th>SiC MOSFET</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>R<sub>DS(ON)</sub></strong></td>
+                                <td>2-5 mΩ</td>
+                                <td>0.5-2 mΩ</td>
+                                <td>1-3 mΩ</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Частота переключения</strong></td>
+                                <td>1-3 MHz</td>
+                                <td>5-20 MHz</td>
+                                <td>2-5 MHz</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Q<sub>g</sub> (заряд затвора)</strong></td>
+                                <td>15-30 nC</td>
+                                <td>3-8 nC</td>
+                                <td>10-20 nC</td>
+                            </tr>
+                            <tr>
+                                <td><strong>КПД @ 2MHz</strong></td>
+                                <td>90-92%</td>
+                                <td>94-96%</td>
+                                <td>92-94%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="interactive-demo">
+                        <h3>🎛️ Продвинутый симулятор Buck Converter</h3>
+                        
+                        <label for="voltageInput">Входное напряжение (Vin): <span id="vinValue">5.0</span>V</label>
+                        <input type="range" id="voltageInput" class="voltage-slider" min="3" max="12" step="0.1" value="5">
+                        
+                        <label for="dutyCycle">Коэффициент заполнения (D): <span id="dutyValue">0.6</span></label>
+                        <input type="range" id="dutyCycle" class="voltage-slider" min="0.1" max="0.9" step="0.05" value="0.6">
+                        
+                        <label for="frequency">Частота переключения: <span id="freqValue">2000</span> kHz</label>
+                        <input type="range" id="frequency" class="voltage-slider" min="500" max="5000" step="100" value="2000">
+                        
+                        <label for="loadCurrent">Ток нагрузки: <span id="currentValue">1.5</span> A</label>
+                        <input type="range" id="loadCurrent" class="voltage-slider" min="0.1" max="3" step="0.1" value="1.5">
+                        
+                        <div class="demo-result">
+                            <div>Выходное напряжение: <span id="voutResult">3.00</span>V</div>
+                            <div>Расчетная эффективность: <span id="efficiencyResult">92</span>%</div>
+                            <div>Мощность потерь: <span id="powerLoss">0.24</span>W</div>
+                            <div>Температура кристалла: <span id="tempResult">42</span>°C</div>
+                        </div>
+                    </div>
+                    
+                    <h3>🔮 Будущие технологии</h3>
+                    
+                    <div class="tech-specs">
+                        <div class="spec-card">
+                            <h4>🧊 Жидкометаллическое охлаждение</h4>
+                            <p>GaInSn сплавы для отвода 50+ Вт/см² от мощных преобразователей. В 5x эффективнее меди.</p>
+                        </div>
+                        <div class="spec-card">
+                            <h4>🔋 Графеновые суперконденсаторы</h4>
+                            <p>Буферные накопители для пиковых нагрузок. 100x больше циклов чем у Li-ion, мгновенная отдача энергии.</p>
+                        </div>
+                        <div class="spec-card">
+                            <h4>🛰️ Квантовые преобразователи</h4>
+                            <p>Использование квантовых туннельных эффектов для КПД >99%. Экспериментальные лабораторные образцы.</p>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- Setup Section -->
-        <div id="setup-section" class="section">
-            <h2>Расстановка кораблей</h2>
-            
-            <div class="game-info">
-                <div class="connection-status" id="connection-status">Подготовка к игре...</div>
-                <p>Расставьте ваши корабли на поле ниже. Для демо-версии корабли расставлены автоматически.</p>
+                <!-- Практическое применение -->
+                <section class="section" id="practical">
+                    <h2>🛠️ Практическое применение и диагностика</h2>
+                    
+                    <div class="deep-dive">
+                        <h3>🔧 Диагностика проблем питания</h3>
+                        
+                        <table class="component-table">
+                            <thead>
+                                <tr>
+                                    <th>Проблема</th>
+                                    <th>Возможные причины</th>
+                                    <th>Методы диагностики</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Быстрый разряд</strong></td>
+                                    <td>Высокий quiescent current, короткое замыкание, неоптимальные настройки DVFS</td>
+                                    <td>Thermal imaging, current profiling, power domain analysis</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Нестабильная работа</strong></td>
+                                    <td>Пульсации питания, плохая развязка, ground bounce</td>
+                                    <td>Осциллограф с активным щупом, анализ спектра шума</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Перегрев PMIC</strong></td>
+                                    <td>Низкий КПД, плохой теплоотвод, excessive switching losses</td>
+                                    <td>IR термометрия, анализ формы сигнала на ключах</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Проблемы с зарядкой</strong></td>
+                                    <td>Неисправность BMS, degradation аккумулятора, плохой контакт</td>
+                                    <td>Протокольный анализ, impedance spectroscopy батареи</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <h3>📐 Расчет компонентов для Buck Converter</h3>
+                    
+                    <div class="code-block">
+                        <span class="comment">// Продвинутый расчет параметров Buck converter</span><br>
+                        <span class="keyword">class</span> <span class="type">BuckConverterDesign</span> {<br>
+                        &nbsp;&nbsp;<span class="keyword">constructor</span>(Vin, Vout, Iout, Fsw) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.Vin = Vin;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.Vout = Vout;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.Iout = Iout;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">this</span>.Fsw = Fsw;<br>
+                        &nbsp;&nbsp;}<br><br>
+                        &nbsp;&nbsp;<span class="function">calculateInductor</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> D = <span class="keyword">this</span>.Vout / <span class="keyword">this</span>.Vin;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> L = (<span class="keyword">this</span>.Vin - <span class="keyword">this</span>.Vout) * D / (<span class="keyword">this</span>.Fsw * <span class="number">0.3</span> * <span class="keyword">this</span>.Iout);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="function">Math</span>.max(L, <span class="number">0.1</span>); <span class="comment">// µH</span><br>
+                        &nbsp;&nbsp;}<br><br>
+                        &nbsp;&nbsp;<span class="function">calculateOutputCap</span>(ripple) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> D = <span class="keyword">this</span>.Vout / <span class="keyword">this</span>.Vin;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> Cout = (<span class="number">1</span> - D) / (<span class="number">8</span> * <span class="keyword">this</span>.Fsw * ripple * <span class="keyword">this</span>.Vout);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> Cout * <span class="number">1e6</span>; <span class="comment">// µF</span><br>
+                        &nbsp;&nbsp;}<br>
+                        }<br><br>
+                        <span class="comment">// Пример использования:</span><br>
+                        <span class="keyword">const</span> design = <span class="keyword">new</span> <span class="type">BuckConverterDesign</span>(<span class="number">5</span>, <span class="number">1.2</span>, <span class="number">3</span>, <span class="number">2000000</span>);<br>
+                        <span class="function">console</span>.log(<span class="string">`Индуктивность: <span class="number">${</span>design.calculateInductor()<span class="number">}</span> µH`</span>);<br>
+                        <span class="function">console</span>.log(<span class="string">`Выходной конденсатор: <span class="number">${</span>design.calculateOutputCap(<span class="number">0.01</span>)<span class="number">}</span> µF`</span>);
+                    </div>
+                </section>
             </div>
-
-            <div class="boards-container">
-                <div class="board-container">
-                    <h4>🎯 Ваше поле</h4>
-                    <div id="setup-board" class="board"></div>
-                </div>
-            </div>
-
-            <div class="ship-counters">
-                <div class="ship-counter">4-палубный: 1</div>
-                <div class="ship-counter">3-палубные: 2</div>
-                <div class="ship-counter">2-палубные: 3</div>
-                <div class="ship-counter">1-палубные: 4</div>
-            </div>
-
-            <div style="text-align: center; margin: 20px 0;">
-                <button onclick="startP2PGame()" id="start-btn" class="success">Начать игру!</button>
-                <button onclick="resetGame()" class="secondary">Начать заново</button>
-            </div>
-
-            <div class="p2p-controls">
-                <div class="code-section">
-                    <h4>📋 Offer код для подключения:</h4>
-                    <textarea id="offer-output" readonly placeholder="После создания игры здесь появится код..."></textarea>
-                    <button onclick="copyOffer()" id="copy-offer-btn">📋 Копировать Offer</button>
-                </div>
-                
-                <div class="code-section" id="answer-section" style="display: none;">
-                    <h4>📥 Answer код:</h4>
-                    <textarea id="answer-output" readonly placeholder="После присоединения здесь появится код..."></textarea>
-                    <button onclick="copyAnswer()" id="copy-answer-btn">📋 Копировать Answer</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Section -->
-        <div id="game-section" class="section">
-            <h2>⚔️ Морской Бой</h2>
-            
-            <div class="game-info">
-                <div class="connection-status status-connected" id="game-status">Соединение установлено</div>
-                <p id="turn-info">Ваш ход! Выберите клетку на поле противника для атаки.</p>
-            </div>
-
-            <div class="boards-container">
-                <div class="board-container">
-                    <h4>🛡️ Ваше поле</h4>
-                    <div id="player-board" class="board"></div>
-                </div>
-                <div class="board-container">
-                    <h4>🎯 Поле противника</h4>
-                    <div id="enemy-board" class="board"></div>
-                </div>
-            </div>
-
-            <div class="ship-counters">
-                <div class="ship-counter" id="player-ships">Ваши корабли: 10/10</div>
-                <div class="ship-counter" id="enemy-ships">Корабли противника: 10/10</div>
-            </div>
-
-            <div style="text-align: center; margin: 20px 0;">
-                <button onclick="resetGame()" class="danger">Завершить игру</button>
-            </div>
-        </div>
-
-        <!-- Waiting Section -->
-        <div id="waiting-section" class="section">
-            <div class="loading">
-                <h2>⏳ Ожидание</h2>
-                <div class="spinner"></div>
-                <p id="waiting-message">Ожидание хода противника...</p>
-                <button onclick="checkConnection()" class="secondary">Проверить соединение</button>
-            </div>
-        </div>
+        </article>
     </div>
 
     <script>
-        class P2PSeaBattle {
-            constructor() {
-                this.peerConnection = null;
-                this.dataChannel = null;
-                this.isOfferer = false;
-                this.gameState = {
-                    playerShips: [],
-                    enemyShips: [],
-                    playerMoves: [],
-                    enemyMoves: [],
-                    currentTurn: null,
-                    gameStarted: false,
-                    playerName: `Игрок-${Math.floor(Math.random() * 1000)}`
-                };
-                
-                this.iceServers = {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' },
-                        { urls: 'stun:stun3.l.google.com:19302' },
-                        { urls: 'stun:stun4.l.google.com:19302' }
-                    ]
-                };
-                
-                this.init();
-            }
+        // Продвинутый симулятор Buck Converter
+        const voltageInput = document.getElementById('voltageInput');
+        const dutyCycle = document.getElementById('dutyCycle');
+        const frequency = document.getElementById('frequency');
+        const loadCurrent = document.getElementById('loadCurrent');
+        const vinValue = document.getElementById('vinValue');
+        const dutyValue = document.getElementById('dutyValue');
+        const freqValue = document.getElementById('freqValue');
+        const currentValue = document.getElementById('currentValue');
+        const voutResult = document.getElementById('voutResult');
+        const efficiencyResult = document.getElementById('efficiencyResult');
+        const powerLoss = document.getElementById('powerLoss');
+        const tempResult = document.getElementById('tempResult');
 
-            init() {
-                this.showSection('connection-section');
-                console.log('P2P Sea Battle initialized');
-            }
-
-            async createP2PGame() {
-                try {
-                    this.isOfferer = true;
-                    this.gameState.currentTurn = 'player';
-                    
-                    document.getElementById('create-btn').disabled = true;
-                    document.getElementById('create-btn').textContent = 'Создание...';
-                    
-                    this.peerConnection = new RTCPeerConnection(this.iceServers);
-                    this.setupConnectionListeners();
-                    
-                    // Создаем канал данных
-                    this.dataChannel = this.peerConnection.createDataChannel('sea-battle', {
-                        ordered: true
-                    });
-                    this.setupDataChannel();
-                    
-                    // Создаем offer
-                    const offer = await this.peerConnection.createOffer();
-                    await this.peerConnection.setLocalDescription(offer);
-                    
-                    this.showOffer(offer);
-                    this.showSetupSection();
-                    
-                    document.getElementById('create-btn').textContent = 'Игра создана!';
-                    
-                } catch (error) {
-                    console.error('Error creating P2P game:', error);
-                    alert('Ошибка при создании игры: ' + error.message);
-                    document.getElementById('create-btn').disabled = false;
-                    document.getElementById('create-btn').textContent = 'Создать игру';
-                }
-            }
-
-            async joinP2PGame() {
-                try {
-                    const offerString = document.getElementById('offer-input').value.trim();
-                    if (!offerString) {
-                        alert('Введите Offer код от создателя игры');
-                        return;
-                    }
-
-                    this.isOfferer = false;
-                    this.gameState.currentTurn = 'enemy';
-                    
-                    document.getElementById('join-btn').disabled = true;
-                    document.getElementById('join-btn').textContent = 'Присоединение...';
-                    
-                    const offer = JSON.parse(atob(offerString));
-                    
-                    this.peerConnection = new RTCPeerConnection(this.iceServers);
-                    this.setupConnectionListeners();
-                    
-                    // Настраиваем обработчик канала данных
-                    this.peerConnection.ondatachannel = (event) => {
-                        this.dataChannel = event.channel;
-                        this.setupDataChannel();
-                    };
-                    
-                    await this.peerConnection.setRemoteDescription(offer);
-                    const answer = await this.peerConnection.createAnswer();
-                    await this.peerConnection.setLocalDescription(answer);
-                    
-                    this.showAnswer(answer);
-                    this.showSetupSection();
-                    
-                    document.getElementById('join-btn').textContent = 'Присоединено!';
-                    
-                } catch (error) {
-                    console.error('Error joining P2P game:', error);
-                    alert('Ошибка при присоединении к игре. Проверьте Offer код: ' + error.message);
-                    document.getElementById('join-btn').disabled = false;
-                    document.getElementById('join-btn').textContent = 'Присоединиться';
-                }
-            }
-
-            setupConnectionListeners() {
-                this.peerConnection.oniceconnectionstatechange = () => {
-                    const state = this.peerConnection.iceConnectionState;
-                    this.updateConnectionStatus(state);
-                    
-                    if (state === 'connected') {
-                        this.onConnectionEstablished();
-                    } else if (state === 'disconnected' || state === 'failed') {
-                        this.showWaiting('Соединение потеряно. Попробуйте переподключиться.');
-                    }
-                };
-
-                this.peerConnection.onicecandidate = (event) => {
-                    if (event.candidate && this.dataChannel && this.dataChannel.readyState === 'open') {
-                        this.sendMessage({
-                            type: 'ice-candidate',
-                            candidate: event.candidate
-                        });
-                    }
-                };
-            }
-
-            setupDataChannel() {
-                this.dataChannel.onopen = () => {
-                    console.log('Data channel opened');
-                    this.updateConnectionStatus('connected');
-                    this.sendMessage({
-                        type: 'player-joined',
-                        playerName: this.gameState.playerName
-                    });
-                };
-
-                this.dataChannel.onclose = () => {
-                    console.log('Data channel closed');
-                    this.updateConnectionStatus('disconnected');
-                };
-
-                this.dataChannel.onmessage = (event) => {
-                    try {
-                        const message = JSON.parse(event.data);
-                        this.handleMessage(message);
-                    } catch (error) {
-                        console.error('Error parsing message:', error);
-                    }
-                };
-            }
-
-            sendMessage(message) {
-                if (this.dataChannel && this.dataChannel.readyState === 'open') {
-                    this.dataChannel.send(JSON.stringify(message));
-                } else {
-                    console.warn('Data channel not ready');
-                }
-            }
-
-            handleMessage(message) {
-                console.log('Received message:', message);
-                
-                switch (message.type) {
-                    case 'ice-candidate':
-                        this.handleICECandidate(message.candidate);
-                        break;
-                    case 'player-joined':
-                        this.handlePlayerJoined(message.playerName);
-                        break;
-                    case 'ships-placed':
-                        this.handleEnemyShips(message.ships);
-                        break;
-                    case 'move':
-                        this.handleEnemyMove(message.move);
-                        break;
-                    case 'game-started':
-                        this.handleGameStarted();
-                        break;
-                    case 'chat':
-                        this.handleChatMessage(message);
-                        break;
-                }
-            }
-
-            async handleICECandidate(candidate) {
-                try {
-                    await this.peerConnection.addIceCandidate(candidate);
-                } catch (error) {
-                    console.error('Error adding ICE candidate:', error);
-                }
-            }
-
-            handlePlayerJoined(playerName) {
-                alert(`Игрок ${playerName} присоединился к игре!`);
-            }
-
-            handleEnemyShips(ships) {
-                this.gameState.enemyShips = ships;
-                if (this.gameState.gameStarted) {
-                    this.updateGameUI();
-                }
-            }
-
-            handleEnemyMove(move) {
-                this.gameState.enemyMoves.push(move);
-                this.gameState.currentTurn = 'player';
-                this.updateGameUI();
-                this.checkWinCondition();
-                
-                // Показываем попадание
-                const hitShip = this.gameState.playerShips.some(ship => 
-                    ship.x === move.x && ship.y === move.y
-                );
-                
-                if (hitShip) {
-                    this.showMessage('Противник попал в ваш корабль!');
-                }
-            }
-
-            handleGameStarted() {
-                this.gameState.gameStarted = true;
-                this.showGameSection();
-                this.updateGameUI();
-            }
-
-            handleChatMessage(message) {
-                // Можно добавить чат в будущем
-                console.log('Chat:', message);
-            }
-
-            async makeMove(x, y) {
-                if (this.gameState.currentTurn !== 'player') {
-                    this.showMessage('Сейчас не ваш ход!');
-                    return;
-                }
-
-                // Проверяем, не стреляли ли уже сюда
-                const alreadyMoved = this.gameState.playerMoves.some(m => m.x === x && m.y === y);
-                if (alreadyMoved) {
-                    this.showMessage('Вы уже стреляли в эту клетку!');
-                    return;
-                }
-
-                const move = { x, y, timestamp: Date.now(), player: this.gameState.playerName };
-                this.gameState.playerMoves.push(move);
-                this.gameState.currentTurn = 'enemy';
-                
-                // Отправляем ход противнику
-                this.sendMessage({
-                    type: 'move',
-                    move: move
-                });
-
-                this.updateGameUI();
-                this.checkWinCondition();
-                this.showWaiting('Ожидание хода противника...');
-            }
-
-            checkWinCondition() {
-                const playerShipsAlive = this.gameState.playerShips.filter(ship =>
-                    !this.gameState.enemyMoves.some(move => move.x === ship.x && move.y === ship.y)
-                ).length;
-
-                const enemyShipsAlive = this.gameState.enemyShips.filter(ship =>
-                    !this.gameState.playerMoves.some(move => move.x === ship.x && move.y === ship.y)
-                ).length;
-
-                // Обновляем счетчики
-                document.getElementById('player-ships').textContent = `Ваши корабли: ${playerShipsAlive}/10`;
-                document.getElementById('enemy-ships').textContent = `Корабли противника: ${enemyShipsAlive}/10`;
-
-                if (playerShipsAlive === 0) {
-                    this.showMessage('😞 Вы проиграли! Все ваши корабли потоплены.');
-                    this.gameState.currentTurn = null;
-                } else if (enemyShipsAlive === 0) {
-                    this.showMessage('🎉 Поздравляем! Вы выиграли!');
-                    this.gameState.currentTurn = null;
-                }
-            }
-
-            startP2PGame() {
-                const ships = this.generateRandomShips();
-                this.gameState.playerShips = ships;
-                this.gameState.gameStarted = true;
-                
-                // Отправляем свои корабли противнику
-                this.sendMessage({
-                    type: 'ships-placed',
-                    ships: ships
-                });
-
-                // Если мы создатель игры, отправляем сигнал начала
-                if (this.isOfferer) {
-                    this.sendMessage({
-                        type: 'game-started'
-                    });
-                }
-
-                this.showGameSection();
-                this.updateGameUI();
-            }
-
-            onConnectionEstablished() {
-                console.log('P2P connection established');
-                this.showMessage('Соединение с противником установлено!');
-            }
-
-            // UI Methods
-            showSection(sectionId) {
-                document.querySelectorAll('.section').forEach(section => {
-                    section.classList.remove('active');
-                });
-                document.getElementById(sectionId).classList.add('active');
-            }
-
-            showSetupSection() {
-                this.showSection('setup-section');
-                this.renderSetupBoard();
-                this.updateConnectionStatus('connecting');
-            }
-
-            showGameSection() {
-                this.showSection('game-section');
-                this.hideWaiting();
-            }
-
-            showWaiting(message = 'Ожидание...') {
-                this.showSection('waiting-section');
-                document.getElementById('waiting-message').textContent = message;
-            }
-
-            hideWaiting() {
-                if (document.getElementById('waiting-section').classList.contains('active')) {
-                    this.showGameSection();
-                }
-            }
-
-            showOffer(offer) {
-                const offerString = btoa(JSON.stringify(offer));
-                document.getElementById('offer-output').value = offerString;
-                document.getElementById('answer-section').style.display = 'none';
-            }
-
-            showAnswer(answer) {
-                const answerString = btoa(JSON.stringify(answer));
-                document.getElementById('answer-output').value = answerString;
-                document.getElementById('answer-section').style.display = 'block';
-            }
-
-            updateConnectionStatus(state) {
-                const statusElement = document.getElementById('connection-status');
-                const gameStatusElement = document.getElementById('game-status');
-                
-                statusElement.textContent = this.getStatusText(state);
-                statusElement.className = `connection-status ${this.getStatusClass(state)}`;
-                
-                if (gameStatusElement) {
-                    gameStatusElement.textContent = this.getStatusText(state);
-                    gameStatusElement.className = `connection-status ${this.getStatusClass(state)}`;
-                }
-            }
-
-            getStatusText(state) {
-                const statusMap = {
-                    'new': 'Подготовка...',
-                    'checking': 'Проверка соединения...',
-                    'connected': '✅ Соединение установлено',
-                    'completed': '✅ Соединение установлено',
-                    'disconnected': '❌ Соединение потеряно',
-                    'failed': '❌ Ошибка соединения',
-                    'connecting': '🔄 Установка соединения...'
-                };
-                return statusMap[state] || state;
-            }
-
-            getStatusClass(state) {
-                const classMap = {
-                    'connected': 'status-connected',
-                    'completed': 'status-connected',
-                    'disconnected': 'status-disconnected',
-                    'failed': 'status-disconnected',
-                    'checking': 'status-connecting',
-                    'connecting': 'status-connecting',
-                    'new': 'status-connecting'
-                };
-                return classMap[state] || 'status-connecting';
-            }
-
-            updateGameUI() {
-                this.renderPlayerBoard();
-                this.renderEnemyBoard();
-
-                const turnInfo = document.getElementById('turn-info');
-                if (this.gameState.currentTurn === 'player') {
-                    turnInfo.textContent = '✅ Ваш ход! Атакуйте поле противника.';
-                    turnInfo.style.color = '#27ae60';
-                    this.hideWaiting();
-                } else {
-                    turnInfo.textContent = '⏳ Ход противника. Ожидайте...';
-                    turnInfo.style.color = '#e67e22';
-                    this.showWaiting('Ожидание хода противника...');
-                }
-
-                this.checkWinCondition();
-            }
-
-            renderSetupBoard() {
-                const board = document.getElementById('setup-board');
-                board.innerHTML = '';
-                
-                const ships = this.generateRandomShips();
-                this.gameState.playerShips = ships; // Сохраняем для игры
-                
-                for (let y = 0; y < 10; y++) {
-                    for (let x = 0; x < 10; x++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        
-                        const hasShip = ships.some(ship => ship.x === x && ship.y === y);
-                        if (hasShip) {
-                            cell.classList.add('ship');
-                        }
-                        
-                        board.appendChild(cell);
-                    }
-                }
-            }
-
-            renderPlayerBoard() {
-                const board = document.getElementById('player-board');
-                board.innerHTML = '';
-                
-                for (let y = 0; y < 10; y++) {
-                    for (let x = 0; x < 10; x++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        
-                        const hasShip = this.gameState.playerShips.some(ship => ship.x === x && ship.y === y);
-                        const isHit = this.gameState.enemyMoves.some(move => move.x === x && move.y === y);
-                        
-                        if (hasShip) cell.classList.add('ship');
-                        if (isHit) cell.classList.add('hit');
-                        if (isHit && !hasShip) cell.classList.add('miss');
-                        
-                        board.appendChild(cell);
-                    }
-                }
-            }
-
-            renderEnemyBoard() {
-                const board = document.getElementById('enemy-board');
-                board.innerHTML = '';
-                
-                for (let y = 0; y < 10; y++) {
-                    for (let x = 0; x < 10; x++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        cell.dataset.x = x;
-                        cell.dataset.y = y;
-                        
-                        const isHit = this.gameState.playerMoves.some(move => move.x === x && move.y === y);
-                        const hasShip = this.gameState.enemyShips.some(ship => ship.x === x && ship.y === y);
-                        
-                        if (isHit) {
-                            cell.classList.add(hasShip ? 'hit' : 'miss');
-                        }
-                        
-                        if (this.gameState.currentTurn === 'player' && !isHit && this.gameState.gameStarted) {
-                            cell.style.cursor = 'pointer';
-                            cell.addEventListener('click', () => {
-                                this.makeMove(x, y);
-                            });
-                        } else {
-                            cell.style.cursor = 'default';
-                        }
-                        
-                        board.appendChild(cell);
-                    }
-                }
-            }
-
-            generateRandomShips() {
-                const ships = [];
-                const shipLengths = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1];
-                
-                for (const length of shipLengths) {
-                    let placed = false;
-                    let attempts = 0;
-                    
-                    while (!placed && attempts < 100) {
-                        const x = Math.floor(Math.random() * 10);
-                        const y = Math.floor(Math.random() * 10);
-                        const horizontal = Math.random() > 0.5;
-                        
-                        if (this.canPlaceShip(ships, x, y, length, horizontal)) {
-                            for (let i = 0; i < length; i++) {
-                                ships.push({
-                                    x: horizontal ? x + i : x,
-                                    y: horizontal ? y : y + i,
-                                    length: length,
-                                    horizontal: horizontal
-                                });
-                            }
-                            placed = true;
-                        }
-                        attempts++;
-                    }
-                    
-                    if (!placed) {
-                        console.warn(`Could not place ship of length ${length}`);
-                    }
-                }
-                
-                return ships;
-            }
-
-            canPlaceShip(existingShips, x, y, length, horizontal) {
-                for (let i = 0; i < length; i++) {
-                    const checkX = horizontal ? x + i : x;
-                    const checkY = horizontal ? y : y + i;
-                    
-                    if (checkX >= 10 || checkY >= 10) return false;
-                    
-                    // Проверяем соседние клетки
-                    for (let dx = -1; dx <= 1; dx++) {
-                        for (let dy = -1; dy <= 1; dy++) {
-                            const neighborX = checkX + dx;
-                            const neighborY = checkY + dy;
-                            
-                            if (neighborX >= 0 && neighborX < 10 && neighborY >= 0 && neighborY < 10) {
-                                const hasNeighborShip = existingShips.some(ship => 
-                                    ship.x === neighborX && ship.y === neighborY
-                                );
-                                if (hasNeighborShip) return false;
-                            }
-                        }
-                    }
-                }
-                return true;
-            }
-
-            showMessage(message) {
-                alert(message);
-            }
-
-            copyOffer() {
-                const offerOutput = document.getElementById('offer-output');
-                offerOutput.select();
-                document.execCommand('copy');
-                this.showMessage('Offer код скопирован в буфер обмена! Отправьте его другу.');
-            }
-
-            copyAnswer() {
-                const answerOutput = document.getElementById('answer-output');
-                answerOutput.select();
-                document.execCommand('copy');
-                this.showMessage('Answer код скопирован! Отправьте его создателю игры.');
-            }
-
-            resetGame() {
-                if (confirm('Вы уверены, что хотите начать заново? Текущая игра будет потеряна.')) {
-                    if (this.peerConnection) {
-                        this.peerConnection.close();
-                    }
-                    this.gameState = {
-                        playerShips: [],
-                        enemyShips: [],
-                        playerMoves: [],
-                        enemyMoves: [],
-                        currentTurn: null,
-                        gameStarted: false,
-                        playerName: `Игрок-${Math.floor(Math.random() * 1000)}`
-                    };
-                    this.showSection('connection-section');
-                    
-                    // Сброс кнопок
-                    document.getElementById('create-btn').disabled = false;
-                    document.getElementById('create-btn').textContent = 'Создать игру';
-                    document.getElementById('join-btn').disabled = false;
-                    document.getElementById('join-btn').textContent = 'Присоединиться';
-                }
-            }
-
-            checkConnection() {
-                if (this.peerConnection) {
-                    const state = this.peerConnection.iceConnectionState;
-                    this.updateConnectionStatus(state);
-                    this.showMessage(`Статус соединения: ${state}`);
-                } else {
-                    this.showMessage('Соединение не установлено');
-                }
-            }
+        function updateBuckConverter() {
+            const vin = parseFloat(voltageInput.value);
+            const duty = parseFloat(dutyCycle.value);
+            const freq = parseFloat(frequency.value);
+            const current = parseFloat(loadCurrent.value);
+            
+            // Расчет выходного напряжения
+            const vout = vin * duty;
+            
+            // Расчет эффективности (усложненная модель)
+            const switchingLoss = 0.0002 * freq / 1000; // Потери на переключение
+            const conductionLoss = 0.015 * current * current; // Потери на проводимость
+            const totalLoss = switchingLoss + conductionLoss;
+            const outputPower = vout * current;
+            const inputPower = outputPower + totalLoss;
+            const efficiency = (outputPower / inputPower) * 100;
+            
+            // Расчет температуры (упрощенная модель)
+            const thermalResistance = 40; // °C/W
+            const ambientTemp = 25;
+            const temp = ambientTemp + (totalLoss * thermalResistance);
+            
+            vinValue.textContent = vin.toFixed(1);
+            dutyValue.textContent = duty.toFixed(2);
+            freqValue.textContent = freq;
+            currentValue.textContent = current.toFixed(1);
+            voutResult.textContent = vout.toFixed(2);
+            efficiencyResult.textContent = Math.max(80, Math.min(97, efficiency.toFixed(0)));
+            powerLoss.textContent = totalLoss.toFixed(2);
+            tempResult.textContent = temp.toFixed(0);
         }
 
-        // Глобальные функции
-        let p2pGame;
-
-        function initGame() {
-            p2pGame = new P2PSeaBattle();
-        }
-
-        function createP2PGame() {
-            p2pGame.createP2PGame();
-        }
-
-        function joinP2PGame() {
-            p2pGame.joinP2PGame();
-        }
-
-        function startP2PGame() {
-            p2pGame.startP2PGame();
-        }
-
-        function copyOffer() {
-            p2pGame.copyOffer();
-        }
-
-        function copyAnswer() {
-            p2pGame.copyAnswer();
-        }
-
-        function resetGame() {
-            p2pGame.resetGame();
-        }
-
-        function checkConnection() {
-            p2pGame.checkConnection();
-        }
-
-        // Инициализация при загрузке
-        window.addEventListener('load', initGame);
+        voltageInput.addEventListener('input', updateBuckConverter);
+        dutyCycle.addEventListener('input', updateBuckConverter);
+        frequency.addEventListener('input', updateBuckConverter);
+        loadCurrent.addEventListener('input', updateBuckConverter);
+        
+        // Инициализация
+        updateBuckConverter();
     </script>
 </body>
 </html>
