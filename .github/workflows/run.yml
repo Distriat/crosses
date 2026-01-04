@@ -2,8 +2,8 @@ name: Запуск кода
 
 on:
   schedule:
-    # Запускать каждые 5 минут
-    - cron: '*/5 * * * *'
+     Запускать каждые 5 минут
+    - cron: '*/0 20 * * *'
   workflow_dispatch:  # Позволяет запускать вручную
 
 jobs:
@@ -24,4 +24,4 @@ jobs:
     # 3. Запуск вашего кода
     - name: Выполнение программы
       run: |
-        python script.py
+        python Script.py
