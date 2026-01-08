@@ -1,26 +1,42 @@
-name: Запуск кода
+name: Webone with localhost.run
 
-on:
-  schedule:
-    - cron: '*/60 * * * *'
-  workflow_dispatch:  # Позволяет запускать вручную
+on: workflow_dispatch
 
 jobs:
-  run-my-code:
-    runs-on: ubuntu-latest  # Используем последний Ubuntu
+  webone-public:
+    runs-on: ubuntu-latest
     
     steps:
-    # 1. Копируем код из репозитория
-    - name: Копирование кода
-      uses: actions/checkout@v3
-    
-    # 2. Настраиваем Python (если нужен)
-    - name: Установка Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-        
-    # 3. Запуск вашего кода
-    - name: Выполнение программы
+    - name: Download and setup Webone
       run: |
-        python Script.py
+        wget https://github.com/atauenis/webone/releases/download/v0.12.0/webone_linux-x64.zip
+        unzip webone_linux-x64.zip
+        chmod +x webone
+    
+    - name: Start Webone
+      run: |
+        ./webone --port 8080 &
+        sleep 3
+        echo "Webone started on port 8080"
+    
+    - name: Create public tunnel with localhost.run
+      run: |
+        # Устанавливаем SSH-клиент
+        sudo apt-get install -y ssh
+        
+        # Создаем туннель (работает через reverse SSH)
+        ssh -R 80:localhost:8080 nokey@localhost.run > tunnel.log 2>&1 &
+        sleep 5
+        
+        # Извлекаем публичный URL из логов
+        TUNNEL_URL=$(grep "tunneled" tunnel.log | awk '{print $NF}')
+        echo "Public URL: $TUNNEL_URL"
+        echo "PUBLIC_URL=$TUNNEL_URL" >> $GITHUB_ENV
+        
+        # Показываем URL
+        echo "🌐 Ваш Webone доступен по адресу: $TUNNEL_URL"
+    
+    - name: Keep alive
+      run: |
+        echo "Сервер будет работать 55 минут..."
+        sleep 3300
